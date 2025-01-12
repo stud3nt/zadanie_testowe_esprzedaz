@@ -1,0 +1,50 @@
+version: "3.5"
+services:
+  nginx:
+    container_name: "${APP_NAME}-nginx"
+    build:
+      context: ./docker/nginx/
+      dockerfile: ./Dockerfile
+    ports:
+      - "${NGINX_BACKEND_PORT}:80"
+    depends_on:
+      - php
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./:/var/www/html
+    networks:
+      network:
+
+  mysql:
+    container_name: "${APP_NAME}-mysql"
+    image: bitnami/mariadb:11.6
+    ports:
+      - "${MARIADB_PORT}:3306"
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: q34fB4CxOPm311DHJLVvuu53VAfTHqBm
+      MARIADB_DATABASE: "${DB_DATABASE}"
+      MARIADB_USER: "${DB_USERNAME}"
+      MARIADB_PASSWORD: "${DB_PASSWORD}"
+      TZ: "Europe/Warsaw"
+    volumes:
+      - ./mysql_db:/var/lib/mysql
+    networks:
+      network:
+
+  php:
+    container_name: "${APP_NAME}-php"
+    build:
+      context: ./docker/php/
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - mysql
+    networks:
+      network:
+
+networks:
+  network:
+    name: ${NETWORK_NAME}

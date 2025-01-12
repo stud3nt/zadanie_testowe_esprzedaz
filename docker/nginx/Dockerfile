@@ -1,0 +1,5 @@
+FROM nginx:latest
+
+EXPOSE 80
+EXPOSE 81
+EXPOSE 4200
